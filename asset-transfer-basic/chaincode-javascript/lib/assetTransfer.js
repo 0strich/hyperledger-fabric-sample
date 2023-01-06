@@ -13,6 +13,7 @@ const { Contract } = require("fabric-contract-api");
 
 class AssetTransfer extends Contract {
   async InitLedger(ctx) {
+    console.log("InitLedger ctx: ", ctx);
     const assets = [
       {
         ID: "asset1",
@@ -102,21 +103,23 @@ class AssetTransfer extends Contract {
   }
 
   // TransferAsset updates the owner field of asset with given id in the world state.
-  async TransferAsset(ctx, id, newOwner) {
+  async TransferAsset(ctx, id, text) {
+    console.log("TransferAsset ctx: ", ctx);
     const assetString = await this.ReadAsset(ctx, id);
     const asset = JSON.parse(assetString);
-    const oldOwner = asset.Owner;
-    asset.Owner = newOwner;
+    const oldText = asset.text;
+    asset.text = text;
     // we insert data in alphabetic order using 'json-stringify-deterministic' and 'sort-keys-recursive'
     await ctx.stub.putState(
       id,
       Buffer.from(stringify(sortKeysRecursive(asset)))
     );
-    return oldOwner;
+    return oldText;
   }
 
   // GetAllAssets returns all assets found in the world state.
   async GetAllAssets(ctx) {
+    console.log("GetAllAssets ctx: ", ctx);
     const allResults = [];
     // range query with empty string for startKey and endKey does an open-ended query of all assets in the chaincode namespace.
     const iterator = await ctx.stub.getStateByRange("", "");
